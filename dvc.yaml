@@ -1,0 +1,31 @@
+stages:
+  # 1. Ham Veriyi İndirme ve Kaydetme Aşaması
+  download_data:
+    cmd: python src/download_data.py  # Çalıştırılacak Python dosyası
+    deps:
+    - src/download_data.py          # Bu kod değişirse aşama yeniden çalışır
+    outs:
+    - data/raw/iris.csv             #DVC'nin versiyonlayacağı ham veri dosyası
+
+  # 2. Veri Temizleme ve Özellik Mühendisliği Aşaması
+  clean_data:
+    cmd: python src/clean_data.py
+    deps:
+    - src/clean_data.py             # Temizleme kodu
+    - data/raw/iris.csv             # Ham veri (değişirse yeniden çalışır)
+    outs:
+    - data/processed/iris_processed.csv # Modelin kullanacağı işlenmiş veri
+
+  # 3. Model Eğitme, Değerlendirme ve Kaydetme Aşaması
+  train_model:
+    cmd: python src/train_model.py
+    deps:
+    - src/train_model.py            # Eğitim kodu
+    - data/processed/iris_processed.csv # İşlenmiş veri
+    outs:
+    - models/iris_random_forest_model.pkl  # Kaydedilen Random Forest modeli
+    - models/iris_logistic_regression_model.pkl # Kaydedilen Lojistik Regresyon modeli
+    - models/iris_features.json     #  Kullanılan özellikler listesi
+    metrics:
+    - models/iris_rf_metrics.json   # Metrikler1: Random Forest
+    - models/iris_lr_metrics.json   # Metrikler2: Lojistik Regresyon
